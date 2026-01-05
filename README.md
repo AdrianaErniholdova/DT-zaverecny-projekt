@@ -104,7 +104,7 @@ FROM fact_sales fs
 JOIN dim_date dd ON fs.id_dim_date = dd.id_dim_date
 JOIN dim_retailer dr ON fs.id_dim_retailer = dr.id_dim_retailer
 GROUP BY dd.date, dr.retailer_name
-ORDER BY dr.retailer_name, dd.date
+ORDER BY dr.retailer_name, dd.date;
 ```
 
 ### 3. Priemerná marža podľa retailera
@@ -174,7 +174,7 @@ SELECT
     SUM(fs.net_sales_retail) AS total_sales_retail
 FROM fact_sales fs
 JOIN dim_item di ON fs.id_dim_item = di.id_dim_item
-GROUP BY di.category_name
+GROUP BY di.category_name;
 ```
 
 ### 6. Tržby predajní podľa lokality
