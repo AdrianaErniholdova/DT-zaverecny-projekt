@@ -1,21 +1,43 @@
 # ELT proces pre dataset Sales and Inventory Data for Retail Business Intelligence
 ---
 ## 1. Úvod a popis zdrojových dát
-V rámci záverečného projektu sme sa rozhodli pracovať s voľne dostupným dataset **Sales and Inventory Data for Retail Business Intelligence** zo **Snowflake Marketplace**, poskytovaný spoločnosťou **SPS Commerce**, s cieľom vytvoriť dátový sklad (DWH) a implementovať ELT proces v prostredí Snowflake. 
-Tento dataset obsahuje dáta z maloobchodného prostredia, poskytuje prehľad o predaji, zásobách a produktoch v rôznych predajniach. Pokrýva obdobie šiestich týždňov, čo umožňuje sledovať krátkodobé predajné trendy a vývoj zásob.
+V rámci záverečného projektu sme sa rozhodli pracovať s free datasetom **Sales and Inventory Data for Retail Business Intelligence** zo **Snowflake Marketplace**, poskytovaným spoločnosťou **SPS Commerce**. 
+Témou projektu je analýza predaja a výkonnosti produktov a predajní v maloobchodnom prostredí.
+Cieľom je vytvoriť dátový sklad (DWH) a implementovať ELT proces v prostredí Snowflake. 
 
-Vybrali sme si ho, pretože je voľne dostupný a obsahuje dáta, ktoré nám umožňujú vytvoriť dátový sklad a analyzovať predajné trendy, výkonnosť predajní a stav zásob.
+Zvolený dataset obsahuje dáta z maloobchodného prostredia, poskytuje prehľad o predaji, zásobách a produktoch v rôznych predajniach. Pokrýva obdobie šiestich týždňov.
 
-Dataset podporuje biznis proces analýzy výkonnosti maloobchodného predaja. Cieľom tohto procesu je sledovanie a vyhodnocovanie predaja produktov, tržieb, zásob a marže naprieč retailermi, predajňami a geografickými lokalitami v čase. Analýza je zameraná na identifikáciu najvýkonnejších predajní a produktov, sledovanie vývoja tržieb v čase a hodnotenie ziskovosti predaja.
+Vybrali sme si ho, pretože je voľne dostupný a obsahuje dáta, ktoré nám umožňujú vytvoriť dátový sklad a analyzovať predajné trendy a výkonnosť retailového biznisu.
 
-**Prehľad tabuliek:**
-Dataset obsahuje štyri hlavné tabuľky:
+Dataset podporuje biznis proces analýzy výkonnosti maloobchodného predaja. Cieľom tohto procesu je sledovanie a vyhodnocovanie predaja produktov, tržieb a marže naprieč retailermi, predajňami a geografickými lokalitami v čase. Analýza je zameraná na identifikáciu najvýkonnejších predajní a produktov, sledovanie vývoja tržieb v čase a hodnotenie ziskovosti predaja.
 
-- **ACTIVITY** - metriky predaja a zásob,
-- **ITEM** - údaje o produktoch a ich kategorizácia,
-- **LOCATION** - informácie o predajných lokalitách,
+**Popis zdrojových tabuliek datasetu:**
+Dataset obsahuje štyri tabuľky:
+
+- **ACTIVITY** - metriky predaja a zásob
+
+Tabuľka `ACTIVITY` zahŕňa metriky predaja a stavu zásob zaznamenávané na týždennej úrovni pre jednotlivé produkty, predajne a retailerov.
+Obsahuje údaje o počte predaných kusov (NET_SALES_UNITS), tržbách (NET_SALES_RETAIL), stave zásob (INVENTORY_UNITS), nákladových a predajných cenách produktov.
+Táto tabuľka je zdrojom dát pre tvorbu faktovej tabuľky v dátovom sklade a slúži na analýzu vývoja predaja a tržieb v čase.
+
+- **ITEM** - údaje o produktoch a ich kategorizácia
+
+Tabuľka `ITEM` obsahuje informácie o produktoch predávaných v maloobchodnej sieti. 
+Zahŕňa údaje o kategórii produktu (CATEGORY_NAME), produktovej skupine (PRODUCT_GROUP_NAME), pohlaví, farbe, veľkosti, identifikátoroch produktu (UPC, štýlové číslo) a nákladovej cene produktu. 
+Tieto údaje tvoria základ dimenzie produktu a umožňujú analyzovať predaj podľa produktových vlastností a kategórií.
+
+- **LOCATION** - informácie o predajných lokalitách
+
+Tabuľka `LOCATION` obsahuje informácie o fyzických predajných lokalitách. Uchováva údaje o názve predajne, čísle predajne, meste, štáte, PSČ, krajine, type predajne (kamenná predajňa/online predaj) a type nákupného centra.
+Slúži ako zdroj pre dimenziu lokality a predajne a umožňuje geografickú analýzu výkonnosti predaja a porovnanie jednotlivých predajní a regiónov. 
+
 - **RETAILER_METADATA** - doplnkové informácie o retaileroch a granularita dát
 
+Tabuľka `RETAILER_METADATA` obsahuje metadáta o jednotlivých retaileroch a definuje granularitu dát v zdrojovom datasete.
+Zahŕňa identifikátor retailera a informáciu o úrovni agregácie dát (ACTIVITYGRAIN). 
+Táto tabuľka je využitá na tvorbu dimenzie retailera a podporuje analýzu výkonnosti jednotlivých predajcov.
+
+V rámci popisu zdrojových tabuliek uvádzame iba tie stĺpce, ktoré sú relevantné. Stĺpce s výhradne NULL hodnotami nezahŕňame v opise.
 ---
 ## 1.1 Dátová architektúra
 
