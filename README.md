@@ -52,7 +52,9 @@ Diagram zobrazuje hlavné entity a atribúty datasetu a vzťahy medzi entitami.
 ---
 ## 2. Dimenzionálny model
 Navrhnutá Star Schema je tvorená jednou tabuľkou faktov a piatimi dimenzionálnymi tabuľkami.
-- **fact_sales** - tabuľka faktov, ktorá predstavuje metriky predaja a obsahuje atribúty:
+
+**Tabuľka faktov:**
+- **fact_sales** - predstavuje metriky predaja a obsahuje atribúty:
   - `id_fact_sales` - primárny kľúč
   - `id_dim_retailer`, `id_dim_item`, `id_dim_location`, `id_dim_date`, `id_dim_store` - cudzie kľúče napojené na všetky dimenzie
   - `net_sales_units`- počet predaných kusov
@@ -64,13 +66,20 @@ Navrhnutá Star Schema je tvorená jednou tabuľkou faktov a piatimi dimenzioná
     
 Window functions použité vo fact_sales:
 ```sql
-SUM(a.net_sales_units) OVER (PARTITION BY a.sps_item_mapping_key , a.sps_customer_location_key ORDER BY a.period_ending_date) AS cumulative_sales,
-LAG(a.net_sales_units) OVER (PARTITION BY a.sps_item_mapping_key , a.sps_customer_location_key ORDER BY a.period_ending_date) AS prev_weekly_sales 
+SUM(a.net_sales_units) OVER (
+    PARTITION BY a.sps_item_mapping_key, a.sps_customer_location_key 
+    ORDER BY a.period_ending_date
+    ) AS cumulative_sales,
+LAG(a.net_sales_units) OVER (
+    PARTITION BY a.sps_item_mapping_key, a.sps_customer_location_key 
+    ORDER BY a.period_ending_date
+    ) AS prev_weekly_sales 
 ```
 
-- **dim_item** - dimenzia produktu, obsahuje id, kategóriu produktu, skupinu, farbu, veľkosť, pohlavie a cenu za kus. SCD Typ 2
+**Dimeznie:**
+- **dim_item** - dimenzia produktu, obsahuje id, kategóriu produktu, skupinu, farbu, veľkosť, pohlavie a cenu za kus. SCD Typ 1
 - **dim_location** - dimenzia lokality, obsahuje id, mesto, štát, PSČ a krajinu. SCD Typ 1
-- **dim_retailer** - dimenzia predajcu, obsahuje id, názov predajcu. SCD Typ 3
+- **dim_retailer** - dimenzia predajcu, obsahuje id, názov predajcu. SCD Typ 1
 - **dim_store** - dimenzia predajne, obsahuje id, názov predajne, číslo, typ predajne, a typ nákupného centra, v ktorom sa nachádza. SCD Typ 1
 - **dim_date** - dimenzia času, obsahuje id, dátum, deň, týždeň, mesiac, kvartál a rok. SCD Typ 0
 
@@ -136,7 +145,7 @@ FROM item_staging i
 Týmto spôsobom boli vytvorené aj zvyšné dimenzie, ktorých tvorba je zobrazená v súbore *transform.sql*.
 
 ---
-### 3.3 Faktová fabuľka 
+### 3.3 Faktová tabuľka 
 **Vytvorenie faktovej tabuľky fact_sales**
 
 ```sql
@@ -153,8 +162,14 @@ SELECT
     a.INVENTORY_UNITS AS inventory_units,
     a.CORPORATE_UNIT_OWNED_RETAIL_PRICE AS retail_price,
     a.CORPORATE_UNIT_ADJUSTED_COST AS corporate_cost,
-    SUM(a.net_sales_units) OVER (PARTITION BY a.sps_item_mapping_key , a.sps_customer_location_key ORDER BY a.period_ending_date) AS cumulative_sales,
-    LAG(a.net_sales_units) OVER (PARTITION BY a.sps_item_mapping_key , a.sps_customer_location_key ORDER BY a.period_ending_date) AS prev_weekly_sales 
+    SUM(a.net_sales_units) OVER (
+        PARTITION BY a.sps_item_mapping_key, a.sps_customer_location_key 
+        ORDER BY a.period_ending_date
+        ) AS cumulative_sales,
+    LAG(a.net_sales_units) OVER (
+        PARTITION BY a.sps_item_mapping_key, a.sps_customer_location_key 
+        ORDER BY a.period_ending_date
+        ) AS prev_weekly_sales 
 FROM activity_staging a 
 JOIN dim_retailer dr ON a.SPS_RETAILER_NAME_KEY = dr.id_dim_retailer
 JOIN dim_item di ON a.SPS_ITEM_MAPPING_KEY = di.id_dim_item
